@@ -6,20 +6,20 @@
 <meta name="description" content="เรียน INT144 ผ่านคำอธิบายภาษาไทย ตัวอย่าง และ transcript ทั้ง 5 คาบ ตั้งแต่ Agile จนถึงการทำงานเป็นทีมใน Scrum">
 <title>INT144 — เรียนให้เข้าใจ Agile & Scrum</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23234a3b'/%3E%3Ctext x='32' y='44' text-anchor='middle' font-size='40' fill='white'%3Ei%3C/text%3E%3C/svg%3E">
-<link rel="stylesheet" href="style.css?v=2"><script src="app.js?v=2" defer></script>
+<link rel="stylesheet" href="style.css?v=3"><script src="i18n.js?v=3" defer></script><script src="app.js?v=3" defer></script>
 </head>
 <body>
-<a class="skip" href="#main">ข้ามไปเนื้อหา</a>
+<a class="skip" href="#main" data-i18n="skip">ข้ามไปเนื้อหา</a>
 <aside id="sidebar">
 <a class="brand" href="#"><span class="brand-icon">i.</span><span>INT144<span class="brand-sub">AGILE LEARNING NOTES</span></span></a>
-<div class="side-label">เส้นทางการเรียนรู้</div>
+<div class="side-label" data-i18n="learningPath">เส้นทางการเรียนรู้</div>
 <nav id="lesson-nav" aria-label="บทเรียน"></nav>
-<div class="sidebar-bottom"><div class="progress-label"><span>ความคืบหน้าของคุณ</span><strong id="progress-count">0 / 5</strong></div><progress id="progress" max="5" value="0">0 จาก 5 บท</progress><p>บันทึกในเบราว์เซอร์เครื่องนี้</p><button class="text-button" id="reset">เริ่มความคืบหน้าใหม่</button></div>
+<div class="sidebar-bottom"><div class="progress-label"><span data-i18n="progress">ความคืบหน้าของคุณ</span><strong id="progress-count">0 / 5</strong></div><progress id="progress" max="5" value="0">0 จาก 5 บท</progress><p data-i18n="savedLocally">บันทึกในเบราว์เซอร์เครื่องนี้</p><button class="text-button" id="reset" data-i18n="reset">เริ่มความคืบหน้าใหม่</button></div>
 </aside>
 <div class="workspace">
-<header><button id="menu" aria-label="เปิดเมนูบทเรียน" aria-expanded="false">☰</button><span class="breadcrumb">ห้องเรียน <span>/</span> <strong id="crumb">ภาพรวม</strong></span><label class="search"><span aria-hidden="true">⌕</span><input id="search" type="search" placeholder="ค้นหาในบทเรียน…" aria-label="ค้นหาบทเรียน"><kbd>/</kbd></label></header>
-<main id="main" tabindex="-1"><p class="loading">กำลังเปิดห้องเรียน…</p></main>
-<footer>INT144 · โน้ตเรียน Agile & Scrum <span>เรียบเรียงจาก transcript การเรียน 5 คาบ</span></footer>
+<header><button id="menu" aria-label="เปิดเมนูบทเรียน" aria-expanded="false">☰</button><span class="breadcrumb"><span data-i18n="classroom">ห้องเรียน</span> <span>/</span> <strong id="crumb">ภาพรวม</strong></span><div class="header-controls"><div id="language-switch" class="language-switch" role="group" aria-label="ภาษาของบทเรียน"><button type="button" data-language="th" aria-pressed="true" lang="th">TH</button><button type="button" data-language="en" aria-pressed="false" lang="en">EN</button></div><label class="search"><span aria-hidden="true">⌕</span><input id="search" type="search" placeholder="ค้นหาในบทเรียน…" aria-label="ค้นหาบทเรียน"><kbd>/</kbd></label></div></header>
+<main id="main" tabindex="-1"><p class="loading" data-i18n="loading">กำลังเปิดห้องเรียน…</p></main>
+<footer><span data-i18n="footer">INT144 · โน้ตเรียน Agile & Scrum</span><span data-i18n="footerSource">เรียบเรียงจาก transcript การเรียน 5 คาบ</span></footer>
 </div>
 <div id="toast" role="status" aria-live="polite"></div>
 </body></html>

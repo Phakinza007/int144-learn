@@ -2,6 +2,7 @@
 
 เว็บสอนภาษาไทย 5 บท 25 หัวข้อ เรียบเรียงจาก transcript INT144-G1 Class 1–5 พร้อมตัวอย่างระบบจองห้อง
 
+- สลับ TH / EN ได้ทั้งเมนูและเนื้อหาครบ 5 บท โดยจำภาษาที่เลือกในเบราว์เซอร์ (transcript ยังคงภาษาไทยต้นฉบับ)
 - เลือกเรียนทีละบท ค้นหาคำในบทเรียน และเปิด transcript ทั้งคาบ
 - ค้นหาและดาวน์โหลด transcript ของแต่ละบท
 - จำสถานะอ่านจบใน localStorage ของเบราว์เซอร์
@@ -27,3 +28,5 @@ python3 -m http.server 8151
 ## เผยแพร่
 
 ใช้ GitHub Pages ผ่าน Actions ตาม `.github/workflows/pages.yml` ตั้ง Settings → Pages → Source เป็น GitHub Actions จากนั้น push ไปยัง main
+
+เนื้อหาภาษาอังกฤษ: แก้ `english_content.py` แล้วรัน `python3 english_content.py` เพื่อสร้าง `lessons.en.json` โดยรักษา ID และลำดับหัวข้อให้ตรงกับภาษาไทย ข้อความ UI อยู่ใน `i18n.js`
