@@ -48,23 +48,37 @@ function overview() {
 function completionButton(l) {
  return `<button class="primary" id="complete" aria-pressed="${completed.includes(l.id)}">${t(completed.includes(l.id) ? 'completed' : 'markComplete')}</button>`;
 }
-function lessonDiagram(id) {
- const diagrams = {
-  1: ['diagram1Title', 'diagram1Steps'],
-  2: ['diagram2Title', 'diagram2Steps'],
-  3: ['diagram3Title', 'diagram3Steps'],
-  4: ['diagram4Title', 'diagram4Steps'],
-  5: ['diagram5Title', 'diagram5Steps']
- };
- const [titleKey, stepsKey] = diagrams[id] || [];
- const steps = titleKey ? t(stepsKey).split('|') : [];
- return `<figure class="lesson-diagram" role="img" aria-label="${esc(t(titleKey))}"><figcaption>${esc(t(titleKey))}</figcaption><div class="diagram-flow">${steps.map((step,i) => `${i ? '<span class="diagram-arrow" aria-hidden="true">→</span>' : ''}<span class="diagram-node">${esc(step)}</span>`).join('')}</div></figure>`;
+function renderVisual(key) {
+ const visual = lessonVisuals[key];
+ if (!visual) return '';
+ const lang = language === 'en' ? 1 : 0;
+ const text = pair => Array.isArray(pair) ? pair[lang] : pair;
+ const localized = (items, className = 'visual-node') => items.map((item, i) => `<div class="${className}">${esc(text(item))}</div>${i < items.length - 1 ? '<span class="diagram-arrow" aria-hidden="true">→</span>' : ''}`).join('');
+ let content = '';
+ if (visual.type === 'compare') {
+  content = `<div class="visual-comparison"><div class="visual-head">${esc(lang ? 'Value first' : 'สิ่งที่ให้ความสำคัญ')}</div><div></div><div class="visual-head">${esc(lang ? 'Also valuable' : 'ยังมีประโยชน์')}</div>${visual.left.map((left,i) => `<div class="visual-choice is-focus">${esc(text(left))}</div><span class="visual-middle">${esc(text(visual.middle))}</span><div class="visual-choice">${esc(text(visual.right[i]))}</div>`).join('')}</div>`;
+ } else if (visual.type === 'flow' || visual.type === 'story') {
+  content = `<div class="diagram-flow ${visual.loop ? 'is-loop' : ''}">${localized(visual.items)}${visual.loop ? '<span class="diagram-loop" aria-hidden="true">↻</span>' : ''}</div>`;
+ } else if (visual.type === 'tiles') {
+  content = `<div class="visual-tiles">${visual.items.map(item => { const value = Array.isArray(item[0]) ? item[lang] : item[lang]; const title = Array.isArray(value) ? value[0] : value; const detail = Array.isArray(value) ? (value.length > 2 ? value.slice(1).join(' · ') : value[1]) : ''; return `<div class="visual-tile"><strong>${esc(title)}</strong>${detail ? `<span>${esc(detail)}</span>` : ''}</div>`; }).join('')}</div>`;
+ } else if (visual.type === 'timeline') {
+  content = `<div class="visual-timeline">${visual.items.map((item,i) => `<div class="timeline-item"><span class="timeline-step">0${i+1}</span><strong>${esc(text(item))}</strong><span>${esc(text(visual.labels[i]))}</span></div>`).join('')}</div>`;
+ } else if (visual.type === 'layers') {
+  content = `<div class="visual-layers">${visual.items.map((item,i) => `<div class="visual-layer" style="--layer:${i}"><b>${esc(text(item))}</b></div>`).join('')}</div>`;
+ } else if (visual.type === 'equation') {
+  content = `<div class="visual-equation"><div class="equation-top">${visual.top.map((part,i) => `${i ? '<span>+</span>' : ''}<b>${esc(text(part))}</b>`).join('')}</div><div class="equation-rule"></div><b class="equation-bottom">${esc(text(visual.bottom))}</b><span class="equation-equals">=</span><b class="equation-result">${esc(text(visual.result))}</b></div>`;
+ } else if (visual.type === 'capacity') {
+  content = `<div class="visual-capacity">${visual.items.map((item,i) => `<div class="capacity-item capacity-${i}"><strong>${esc(text(item[0]))}</strong><span>${esc(text(item[1]))}</span></div>${i < visual.items.length - 1 ? '<span class="capacity-op" aria-hidden="true">−</span>' : ''}`).join('')}</div>`;
+ } else if (visual.type === 'tshape') {
+  content = `<div class="visual-tshape"><div class="t-bar">${esc(text(visual.horizontal))}</div><div class="t-stem">${esc(text(visual.vertical))}</div></div>`;
+ }
+ return `<figure class="lesson-visual" role="img" aria-label="${esc(text(visual.title))}"><figcaption>${esc(text(visual.title))}</figcaption>${content}${visual.note ? `<p class="visual-note">${esc(text(visual.note))}</p>` : ''}</figure>`;
 }
 async function lesson(l, source, version, {focusTab = false} = {}) {
  document.title = t('lessonTitle', {id:l.id, title:l.title});
  navigation(l.id);
  $('#crumb').textContent = t('lessonNumber', {id:l.id});
- $('#main').innerHTML = `<div class="lesson-header"><div class="eyebrow">LESSON ${String(l.id).padStart(2,'0')} / 05</div><h1>${esc(l.title)}</h1><p class="intro">${esc(l.intro)}</p>${lessonDiagram(l.id)}<div class="lesson-meta"><span>${esc(l.en)}</span><span>${t('readDuration', {count:l.minutes})}</span></div></div><div class="tabs" role="tablist" aria-label="${t('contentFormat')}"><button id="tab-reading" class="tab" role="tab" aria-selected="${!source}" aria-controls="panel">${t('readingTab')}</button><button id="tab-source" class="tab" role="tab" aria-selected="${source}" aria-controls="panel">${t('transcriptTab')}</button></div><div id="panel" role="tabpanel" tabindex="0" aria-labelledby="tab-${source ? 'source' : 'reading'}"></div>`;
+ $('#main').innerHTML = `<div class="lesson-header"><div class="eyebrow">LESSON ${String(l.id).padStart(2,'0')} / 05</div><h1>${esc(l.title)}</h1><p class="intro">${esc(l.intro)}</p><div class="lesson-meta"><span>${esc(l.en)}</span><span>${t('readDuration', {count:l.minutes})}</span></div></div><div class="tabs" role="tablist" aria-label="${t('contentFormat')}"><button id="tab-reading" class="tab" role="tab" aria-selected="${!source}" aria-controls="panel">${t('readingTab')}</button><button id="tab-source" class="tab" role="tab" aria-selected="${source}" aria-controls="panel">${t('transcriptTab')}</button></div><div id="panel" role="tabpanel" tabindex="0" aria-labelledby="tab-${source ? 'source' : 'reading'}"></div>`;
  $('#tab-reading').onclick = () => { location.hash = `lesson/${l.id}`; };
  $('#tab-source').onclick = () => { location.hash = `lesson/${l.id}/transcript`; };
  document.querySelectorAll('[role=tab]').forEach(tab => {
@@ -79,7 +93,7 @@ async function lesson(l, source, version, {focusTab = false} = {}) {
  });
  if (focusTab) document.querySelector('[role=tab][aria-selected=true]').focus({preventScroll:true});
  if (source) { await transcript(l, version); return; }
- $('#panel').innerHTML = `<div class="lesson-layout"><article>${l.sections.map((s,i) => `<section class="reading-section" id="section-${i}"><h2><small>${String(i+1).padStart(2,'0')} </small>${esc(s.title)}</h2><p>${esc(s.body)}</p><aside class="example"><strong>${t('exampleLabel')}</strong><p>${esc(s.example)}</p></aside><div class="takeaway">${t('takeaway')} → ${esc(s.takeaway)}</div>${s.source ? `<p class="section-source">${t('sectionSource')}: ${esc(s.source)}</p>` : ''}</section>`).join('')}<div class="lesson-end">${completionButton(l)}<a class="secondary" href="${l.id < 5 ? `#lesson/${l.id+1}` : '#'}">${t(l.id < 5 ? 'next' : 'back')}</a><button id="print" class="secondary">${t('print')}</button></div><div class="note">${esc(t('basedOn', {name:l.sourceName}))}<br>${t('exampleNote')}${l.references?.length ? `<p class="reference-heading">${t('reviewedReferences')}</p><ul class="reference-list">${l.references.map(ref => `<li><a href="${esc(ref.url)}" target="_blank" rel="noopener noreferrer">${esc(ref.label)} ↗</a></li>`).join('')}</ul>` : ''}</div></article><nav class="toc" aria-label="${t('toc')}"><strong>${t('inLesson')}</strong>${l.sections.map((s,i) => `<a href="#lesson/${l.id}/section/${i}">${i+1}. ${esc(s.title)}</a>`).join('')}</nav></div>`;
+ $('#panel').innerHTML = `<div class="lesson-layout"><article>${l.sections.map((s,i) => `<section class="reading-section" id="section-${i}"><h2><small>${String(i+1).padStart(2,'0')} </small>${esc(s.title)}</h2><p>${esc(s.body)}</p>${renderVisual(`${l.id}-${i}`)}<aside class="example"><strong>${t('exampleLabel')}</strong><p>${esc(s.example)}</p></aside><div class="takeaway">${t('takeaway')} → ${esc(s.takeaway)}</div>${s.source ? `<p class="section-source">${t('sectionSource')}: ${esc(s.source)}</p>` : ''}</section>`).join('')}<div class="lesson-end">${completionButton(l)}<a class="secondary" href="${l.id < 5 ? `#lesson/${l.id+1}` : '#'}">${t(l.id < 5 ? 'next' : 'back')}</a><button id="print" class="secondary">${t('print')}</button></div><div class="note">${esc(t('basedOn', {name:l.sourceName}))}<br>${t('exampleNote')}${l.references?.length ? `<p class="reference-heading">${t('reviewedReferences')}</p><ul class="reference-list">${l.references.map(ref => `<li><a href="${esc(ref.url)}" target="_blank" rel="noopener noreferrer">${esc(ref.label)} ↗</a></li>`).join('')}</ul>` : ''}</div></article><nav class="toc" aria-label="${t('toc')}"><strong>${t('inLesson')}</strong>${l.sections.map((s,i) => `<a href="#lesson/${l.id}/section/${i}">${i+1}. ${esc(s.title)}</a>`).join('')}</nav></div>`;
  $('#complete').onclick = () => {
   const done = completed.includes(l.id);
   completed = done ? completed.filter(x => x !== l.id) : [...completed, l.id];

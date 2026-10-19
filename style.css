@@ -40,4 +40,48 @@ header{position:sticky;top:0;z-index:4;background:var(--paper)}
 .diagram-node:nth-of-type(4n+1){background:#eef2e8}
 .diagram-arrow{display:flex;align-items:center;color:#7f9472;font-size:18px}
 @media(max-width:760px){.lesson-diagram{margin:20px 0 16px;padding:15px}.diagram-flow{display:grid;grid-template-columns:1fr;gap:6px}.diagram-node{min-height:0;padding:9px 12px}.diagram-arrow{height:15px;justify-content:center;transform:rotate(90deg);font-size:15px}}
-@media print{.lesson-diagram{break-inside:avoid}}
+.lesson-visual{margin:22px 0;padding:18px 20px;background:#fff;border:1px solid var(--line);border-radius:11px;box-shadow:0 4px 16px #243d3408}
+.lesson-visual figcaption{font-size:12px;line-height:1.6;font-weight:700;color:#354586;margin-bottom:15px}
+.visual-comparison{display:grid;grid-template-columns:minmax(0,1fr) 78px minmax(0,1fr);gap:7px 8px;align-items:stretch}
+.visual-head{text-align:center;font-size:11px;color:var(--muted);padding:0 4px 5px}
+.visual-choice{min-height:48px;display:grid;place-items:center;text-align:center;padding:9px 11px;border-radius:999px;background:#f1edf9;color:#494072;font-size:12px;line-height:1.55}
+.visual-choice.is-focus{background:#eee8fb;color:#3f3b76;font-weight:700}
+.visual-middle{display:grid;place-items:center;text-align:center;color:#fff;background:#ee6a7a;clip-path:polygon(0 50%,24% 0,76% 0,100% 50%,76% 100%,24% 100%);font-size:10px;line-height:1.3;padding:5px}
+.diagram-flow{display:flex;align-items:stretch;justify-content:center;gap:8px;position:relative}
+.visual-node{min-height:57px;display:flex;flex:1;align-items:center;justify-content:center;text-align:center;padding:10px 11px;border:1px solid #dfe4f4;border-radius:8px;background:#f4f5fb;color:#354164;font-size:12px;line-height:1.55}
+.diagram-arrow{align-self:center;color:#e26a79;font-size:19px;font-weight:700}
+.diagram-loop{position:absolute;right:-4px;bottom:-12px;border-radius:50%;background:#fff;color:#6d7c55;font-size:22px;line-height:1;padding:2px 5px}
+.visual-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:9px}
+.visual-tile{min-height:72px;display:flex;flex-direction:column;justify-content:center;padding:11px 14px;border-radius:9px;background:#f1eef9;border:1px solid #e7e1f3;text-align:left}
+.visual-tile:nth-child(4n+2){background:#fbecef;border-color:#f4e0e4}
+.visual-tile:nth-child(4n+3){background:#eff2e8;border-color:#e2e9d7}
+.visual-tile:nth-child(4n){background:#edf3f6;border-color:#dde9ed}
+.visual-tile strong{font-size:12px;color:#383d70;line-height:1.55}
+.visual-tile span{display:block;margin-top:4px;font-size:11px;color:#65716d;line-height:1.65}
+.visual-note{text-align:center;margin:12px 0 0;font-size:10px!important;color:var(--muted)!important;line-height:1.6!important}
+.visual-timeline{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;position:relative}
+.timeline-item{display:flex;flex-direction:column;gap:6px;padding:12px;border-radius:9px;background:#f1eef9;min-height:100px}
+.timeline-step{color:#e36d7c;font:16px Georgia,serif}
+.timeline-item strong{font-size:12px;line-height:1.5;color:#343c6b}
+.timeline-item>span:last-child{font-size:10px;line-height:1.5;color:var(--muted)}
+.visual-layers{display:grid;justify-items:center;gap:5px}
+.visual-layer{width:calc(100% - var(--layer)*12%);text-align:center;padding:8px;background:linear-gradient(90deg,#eeeafa,#eaf1e7);border-radius:6px;font-size:11px}
+.visual-equation{display:grid;grid-template-columns:1fr auto minmax(100px,.5fr);gap:9px;align-items:center;text-align:center}
+.equation-top{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap}
+.equation-top b,.equation-bottom,.equation-result{padding:9px 12px;border-radius:8px;background:#f0edf9;color:#403d72;font-size:12px}
+.equation-top>span{color:#e36d7c;font-weight:700}
+.equation-rule{grid-column:1;border-top:2px solid #6f7c58;margin-top:-9px}
+.equation-bottom{grid-column:1}
+.equation-equals{grid-column:2;grid-row:1/4;color:#e36d7c;font-size:23px;font-weight:700}
+.equation-result{grid-column:3;grid-row:1/4;background:#eaf1df;font-size:15px}
+.visual-capacity{display:flex;align-items:center;justify-content:center;gap:10px}
+.capacity-item{display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;flex:1;padding:12px 8px;background:#f0edf9;border-radius:9px}
+.capacity-item strong{font-size:24px;color:#3f4478}
+.capacity-item span{font-size:10px;line-height:1.45;color:var(--muted)}
+.capacity-2{background:#eaf1df}.capacity-2 strong{color:var(--green)}
+.capacity-op{font-size:22px;color:#e36d7c;font-weight:700}
+.visual-tshape{display:flex;flex-direction:column;align-items:center;padding:10px}
+.t-bar{width:85%;padding:14px 18px;background:#efebfa;border-radius:8px;text-align:center;color:#3f3c76;font-size:12px}
+.t-stem{width:45%;min-height:68px;padding:12px;background:#eaf1df;border-radius:0 0 8px 8px;text-align:center;color:var(--green);font-size:12px}
+@media(max-width:760px){.lesson-visual{padding:15px 12px;margin:18px 0}.visual-comparison{grid-template-columns:minmax(0,1fr) 50px minmax(0,1fr);gap:6px 5px}.visual-choice{font-size:10px;padding:7px 5px;min-height:50px}.visual-middle{font-size:9px}.diagram-flow{flex-direction:column;gap:5px;padding:0 3px 12px}.visual-node{min-height:0;padding:9px}.diagram-flow>.diagram-arrow{font-size:0;height:13px}.diagram-flow>.diagram-arrow::before{content:'↓';font-size:16px}.diagram-loop{right:6px;bottom:-4px}.visual-timeline{grid-template-columns:repeat(2,minmax(0,1fr))}.visual-tiles{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.visual-tile{padding:9px;min-height:68px}.visual-tile strong{font-size:11px}.visual-tile span{font-size:10px}.visual-equation{grid-template-columns:1fr auto 1fr;gap:6px}.equation-top{gap:4px}.equation-top b,.equation-bottom{padding:7px;font-size:10px}.equation-result{font-size:12px;padding:8px 5px}.capacity-item{padding:9px 5px}.capacity-item strong{font-size:20px}.capacity-item span{font-size:9px}.t-bar{width:96%;font-size:10px;padding:12px}.t-stem{width:65%;font-size:10px}}
+@media print{.lesson-visual{break-inside:avoid;box-shadow:none}}
