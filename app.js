@@ -24,7 +24,10 @@ function updateShell() {
  $('#search').setAttribute('aria-label', t('searchLabel'));
  $('#search').placeholder = t('searchPlaceholder');
  $('#language-switch').setAttribute('aria-label', t('language'));
- document.querySelectorAll('[data-language]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.language === language)));
+ document.querySelectorAll('[data-language]').forEach(button => {
+  button.setAttribute('aria-pressed', String(button.dataset.language === language));
+  button.disabled = !catalogs[button.dataset.language];
+ });
 }
 function navigation(active = 0) {
  $('#lesson-nav').innerHTML = `<a class="nav-link ${active === 0 ? 'active' : ''}" ${active === 0 ? 'aria-current="page"' : ''} href="#"><span class="nav-number">⌂</span><span>${t('overviewNav')}</span></a>` + lessons.map(l => `<a class="nav-link ${active === l.id ? 'active' : ''}" ${active === l.id ? 'aria-current="page"' : ''} href="#lesson/${l.id}"><span class="nav-number">${completed.includes(l.id) ? '✓' : String(l.id).padStart(2,'0')}</span><span>${esc(l.title)}</span></a>`).join('');
@@ -186,6 +189,7 @@ updateShell();
    return [lang, await response.json()];
   }));
   catalogs = Object.fromEntries(content); lessons = catalogs[language];
+  updateShell();
   await route();
  } catch {
   $('#main').innerHTML = `<h1>${t('loadError')}</h1><p>${t('loadErrorHint')}</p><button class="primary" id="reload">${t('reload')}</button>`;
