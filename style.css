@@ -30,3 +30,6 @@ header{position:sticky;top:0;z-index:4;background:var(--paper)}
 .reading-section{scroll-margin-top:110px}
 @media(max-width:760px){.reading-section{scroll-margin-top:96px}}
 .search:focus-within{outline:3px solid #75974b;outline-offset:3px}
+
+.reading-section .section-source{font-size:11px;line-height:1.8;color:var(--muted);margin:18px 0 0}
+.reference-heading{font-weight:600;margin:16px 0 6px}.reference-list{margin:0;padding-left:20px}.reference-list a{overflow-wrap:anywhere}
