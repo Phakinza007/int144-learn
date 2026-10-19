@@ -14,7 +14,8 @@ function notify(message) {
 }
 function saveProgress() {
  try { localStorage.setItem('int144-completed', JSON.stringify(completed)); }
- catch { notify(t('storageError')); }
+ catch { notify(t('storageError')); return false; }
+ return true;
 }
 function updateShell() {
  document.documentElement.lang = language;
@@ -45,31 +46,33 @@ function overview() {
 function completionButton(l) {
  return `<button class="primary" id="complete" aria-pressed="${completed.includes(l.id)}">${t(completed.includes(l.id) ? 'completed' : 'markComplete')}</button>`;
 }
-async function lesson(l, source, version) {
+async function lesson(l, source, version, {focusTab = false} = {}) {
  document.title = t('lessonTitle', {id:l.id, title:l.title});
  navigation(l.id);
  $('#crumb').textContent = t('lessonNumber', {id:l.id});
- $('#main').innerHTML = `<div class="lesson-header"><div class="eyebrow">LESSON ${String(l.id).padStart(2,'0')} / 05</div><h1>${esc(l.title)}</h1><p class="intro">${esc(l.intro)}</p><div class="lesson-meta"><span>${esc(l.en)}</span><span>${t('readDuration', {count:l.minutes})}</span></div></div><div class="tabs" role="tablist" aria-label="${t('contentFormat')}"><button id="tab-reading" class="tab" role="tab" aria-selected="${!source}" aria-controls="panel">${t('readingTab')}</button><button id="tab-source" class="tab" role="tab" aria-selected="${source}" aria-controls="panel">${t('transcriptTab')}</button></div><div id="panel" role="tabpanel" aria-labelledby="tab-${source ? 'source' : 'reading'}"></div>`;
+ $('#main').innerHTML = `<div class="lesson-header"><div class="eyebrow">LESSON ${String(l.id).padStart(2,'0')} / 05</div><h1>${esc(l.title)}</h1><p class="intro">${esc(l.intro)}</p><div class="lesson-meta"><span>${esc(l.en)}</span><span>${t('readDuration', {count:l.minutes})}</span></div></div><div class="tabs" role="tablist" aria-label="${t('contentFormat')}"><button id="tab-reading" class="tab" role="tab" aria-selected="${!source}" aria-controls="panel">${t('readingTab')}</button><button id="tab-source" class="tab" role="tab" aria-selected="${source}" aria-controls="panel">${t('transcriptTab')}</button></div><div id="panel" role="tabpanel" tabindex="0" aria-labelledby="tab-${source ? 'source' : 'reading'}"></div>`;
  $('#tab-reading').onclick = () => { location.hash = `lesson/${l.id}`; };
  $('#tab-source').onclick = () => { location.hash = `lesson/${l.id}/transcript`; };
  document.querySelectorAll('[role=tab]').forEach(tab => {
   tab.tabIndex = tab.getAttribute('aria-selected') === 'true' ? 0 : -1;
   tab.onkeydown = e => {
-   if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+   if (['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(e.key)) {
     e.preventDefault();
-    location.hash = source ? `lesson/${l.id}` : `lesson/${l.id}/transcript`;
+    const showSource = e.key === 'End' || (e.key !== 'Home' && !source);
+    if (showSource !== source) location.hash = `lesson/${l.id}${showSource ? '/transcript' : ''}`;
    }
   };
  });
+ if (focusTab) document.querySelector('[role=tab][aria-selected=true]').focus({preventScroll:true});
  if (source) { await transcript(l, version); return; }
  $('#panel').innerHTML = `<div class="lesson-layout"><article>${l.sections.map((s,i) => `<section class="reading-section" id="section-${i}"><h2><small>${String(i+1).padStart(2,'0')} </small>${esc(s.title)}</h2><p>${esc(s.body)}</p><aside class="example"><strong>${t('exampleLabel')}</strong><p>${esc(s.example)}</p></aside><div class="takeaway">${t('takeaway')} → ${esc(s.takeaway)}</div></section>`).join('')}<div class="lesson-end">${completionButton(l)}<a class="secondary" href="${l.id < 5 ? `#lesson/${l.id+1}` : '#'}">${t(l.id < 5 ? 'next' : 'back')}</a><button id="print" class="secondary">${t('print')}</button></div><div class="note">${esc(t('basedOn', {name:l.sourceName}))}<br>${t('exampleNote')}</div></article><nav class="toc" aria-label="${t('toc')}"><strong>${t('inLesson')}</strong>${l.sections.map((s,i) => `<a href="#lesson/${l.id}/section/${i}">${i+1}. ${esc(s.title)}</a>`).join('')}</nav></div>`;
  $('#complete').onclick = () => {
   const done = completed.includes(l.id);
   completed = done ? completed.filter(x => x !== l.id) : [...completed, l.id];
-  saveProgress(); navigation(l.id);
+  const saved = saveProgress(); navigation(l.id);
   $('#complete').textContent = t(done ? 'markComplete' : 'completed');
   $('#complete').setAttribute('aria-pressed', String(!done));
-  notify(t(done ? 'unmarked' : 'marked'));
+  if (saved) notify(t(done ? 'unmarked' : 'marked'));
  };
  $('#print').onclick = () => window.print();
 }
@@ -121,8 +124,12 @@ function search(query) {
  $('#main').innerHTML = `<div class="eyebrow">SEARCH LESSONS</div><h1>${esc(t('searchHeading', {query:q}))}</h1><p>${t('searchCount', {count:results.length})}</p>${results.map(({l,i,s,snippet}) => `<div class="result"><div class="eyebrow">${t('lessonNumber', {id:l.id})} · ${esc(l.en)}</div><a href="#lesson/${l.id}/section/${i}">${highlight(s.title,q)} ↗</a><p>…${highlight(snippet,q)}…</p></div>`).join('') || `<p class="empty">${t('searchEmpty')}</p>`}`;
 }
 async function route({preserveScroll = false} = {}) {
+ clearTimeout(search.timer); search.timer = null;
+ if (!lessons.length) return;
+ const focusTab = document.activeElement?.getAttribute('role') === 'tab';
+ const focusMain = $('#sidebar').contains(document.activeElement);
  const version = ++routeVersion, parts = location.hash.slice(1).split('/');
- document.body.classList.remove('menu-open'); $('#menu').setAttribute('aria-expanded','false');
+ setMenu(false);
  if (parts[0] === 'search') {
   let query = ''; try { query = decodeURIComponent(parts.slice(1).join('/')); } catch {}
   $('#search').value = query; search(query); return;
@@ -130,52 +137,98 @@ async function route({preserveScroll = false} = {}) {
  $('#search').value = '';
  const l = lessons.find(x => x.id === Number(parts[1]));
  if (parts[0] === 'lesson' && l) {
-  await lesson(l, parts[2] === 'transcript', version);
-  if (version !== routeVersion || preserveScroll) return;
+  await lesson(l, parts[2] === 'transcript', version, {focusTab});
+  if (version !== routeVersion) return;
+  if (focusMain) $('#main').focus({preventScroll:true});
+  if (preserveScroll) return;
   if (parts[2] === 'section') document.getElementById(`section-${Number(parts[3])}`)?.scrollIntoView();
   else window.scrollTo(0,0);
- } else { overview(); if (!preserveScroll) window.scrollTo(0,0); }
+ } else { overview(); if (focusMain) $('#main').focus({preventScroll:true}); if (!preserveScroll) window.scrollTo(0,0); }
 }
+const mobileLayout = window.matchMedia('(max-width:760px)');
+function setMenu(open, {restoreFocus = false} = {}) {
+ open = mobileLayout.matches && open;
+ document.body.classList.toggle('menu-open', open);
+ $('#menu').setAttribute('aria-expanded', String(open));
+ $('#sidebar').inert = mobileLayout.matches && !open;
+ if (open) requestAnimationFrame(() => {
+  if (document.body.classList.contains('menu-open')) ($('#lesson-nav [aria-current=page]') || $('#menu-close')).focus({preventScroll:true});
+ });
+ else if (restoreFocus && mobileLayout.matches) $('#menu').focus({preventScroll:true});
+}
+mobileLayout.addEventListener('change', () => setMenu(false));
+setMenu(false);
 $('.skip').onclick = e => { e.preventDefault(); $('#main').focus(); };
-$('#menu').onclick = () => { const open = document.body.classList.toggle('menu-open'); $('#menu').setAttribute('aria-expanded',String(open)); };
+$('#menu').onclick = () => setMenu(!document.body.classList.contains('menu-open'));
+$('#menu-close').onclick = () => setMenu(false, {restoreFocus:true});
 document.addEventListener('click', e => {
- if (document.body.classList.contains('menu-open') && !e.target.closest('#sidebar') && !e.target.closest('#menu')) {
-  document.body.classList.remove('menu-open'); $('#menu').setAttribute('aria-expanded','false');
- }
+ const href = e.target.closest('a[href^="#"]')?.getAttribute('href');
+ if (href && href !== '#main' && href === (location.hash || '#')) { e.preventDefault(); route(); }
+ if (document.body.classList.contains('menu-open') && !e.target.closest('#sidebar') && !e.target.closest('#menu')) setMenu(false);
 });
 document.addEventListener('keydown', e => {
- if (e.key === '/' && !['INPUT','TEXTAREA'].includes(document.activeElement.tagName)) { e.preventDefault(); $('#search').focus(); }
- if (e.key === 'Escape') { document.body.classList.remove('menu-open'); $('#menu').setAttribute('aria-expanded','false'); }
+ if (e.key === '/' && !['INPUT','TEXTAREA'].includes(document.activeElement.tagName) && !document.activeElement.isContentEditable) { e.preventDefault(); setMenu(false); $('#search').focus(); }
+ if (e.key === 'Escape' && document.body.classList.contains('menu-open')) setMenu(false, {restoreFocus:true});
 });
 $('#reset').onclick = () => {
  if (!completed.length) { notify(t('noProgress')); return; }
- if (confirm(t('resetConfirm'))) { completed = []; saveProgress(); route(); notify(t('resetDone')); }
+ if (confirm(t('resetConfirm'))) { completed = []; const saved = saveProgress(); route(); if (saved) notify(t('resetDone')); }
 };
 $('#search').oninput = () => {
  clearTimeout(search.timer);
  search.timer = setTimeout(() => {
+  search.timer = null;
   const query = $('#search').value.trim();
   history.replaceState(null,'',query ? `#search/${encodeURIComponent(query)}` : '#');
   ++routeVersion; search(query);
  },180);
 };
+function captureReadingPosition() {
+ const sections = [...document.querySelectorAll('.reading-section')];
+ const readingLine = document.querySelector('header').getBoundingClientRect().bottom + 24;
+ const nextHeading = sections.find(el => { const top = el.getBoundingClientRect().top; return top > readingLine && top <= readingLine + 160; });
+ const section = nextHeading || sections.find(el => { const box = el.getBoundingClientRect(); return box.top <= readingLine + 1 && box.bottom > readingLine; });
+ if (!section) return {scroll:window.scrollY};
+ const box = section.getBoundingClientRect();
+ if (nextHeading) return {id:section.id, offset:box.top - readingLine};
+ return {id:section.id, fraction:Math.max(0, Math.min(1, (readingLine - box.top) / box.height))};
+}
+function restoreReadingPosition(position) {
+ const section = position.id && document.getElementById(position.id);
+ if (section) {
+  const box = section.getBoundingClientRect();
+  const readingLine = document.querySelector('header').getBoundingClientRect().bottom + 24;
+  const withinSection = position.offset !== undefined ? -position.offset : position.fraction * box.height;
+  window.scrollTo(0, window.scrollY + box.top + withinSection - readingLine);
+ } else window.scrollTo(0, position.scroll || 0);
+}
 document.querySelectorAll('[data-language]').forEach(button => {
  button.onclick = async () => {
   if (button.dataset.language === language || !catalogs[button.dataset.language]) return;
-  clearTimeout(search.timer);
-  const scroll = window.scrollY;
+  if (search.timer) {
+   clearTimeout(search.timer); search.timer = null;
+   const query = $('#search').value.trim();
+   history.replaceState(null, '', query ? `#search/${encodeURIComponent(query)}` : '#');
+  }
+  const position = captureReadingPosition();
   const transcriptQuery = $('#source-search')?.value;
+  const source = $('#transcript');
+  const sourceFraction = source ? source.scrollTop / Math.max(1, source.scrollHeight - source.clientHeight) : 0;
   language = button.dataset.language;
   lessons = catalogs[language];
   let saved = true;
   try { localStorage.setItem('int144-language', language); } catch { saved = false; }
   updateShell();
+  const version = routeVersion + 1;
   await route({preserveScroll:true});
+  if (version !== routeVersion) return;
   if (transcriptQuery !== undefined && $('#source-search')) {
    $('#source-search').value = transcriptQuery;
    $('#source-search').dispatchEvent(new Event('input'));
+   const transcript = $('#transcript');
+   transcript.scrollTop = sourceFraction * (transcript.scrollHeight - transcript.clientHeight);
   }
-  window.scrollTo(0,scroll);
+  restoreReadingPosition(position);
   if (!saved) notify(t('languageSavedError'));
  };
 });
@@ -183,14 +236,18 @@ window.addEventListener('hashchange', () => route());
 updateShell();
 (async () => {
  try {
-  const content = await Promise.all(['th','en'].map(async lang => {
+  const content = await Promise.allSettled(['th','en'].map(async lang => {
    const response = await fetch(lang === 'th' ? 'lessons.json' : 'lessons.en.json');
    if (!response.ok) throw new Error('Lessons unavailable');
    return [lang, await response.json()];
   }));
-  catalogs = Object.fromEntries(content); lessons = catalogs[language];
+  catalogs = Object.fromEntries(content.filter(result => result.status === 'fulfilled').map(result => result.value));
+  if (!catalogs.th && !catalogs.en) throw new Error('No lesson catalog available');
+  if (!catalogs[language]) language = catalogs.th ? 'th' : 'en';
+  lessons = catalogs[language];
   updateShell();
   await route();
+  if (Object.keys(catalogs).length < 2) notify(t('languageUnavailable'));
  } catch {
   $('#main').innerHTML = `<h1>${t('loadError')}</h1><p>${t('loadErrorHint')}</p><button class="primary" id="reload">${t('reload')}</button>`;
   $('#reload').onclick = () => location.reload();

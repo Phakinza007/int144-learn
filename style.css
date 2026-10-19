@@ -12,3 +12,21 @@ html[lang=en] .section-heading{gap:20px}
 .source-top p{overflow-wrap:anywhere}
 @media(max-width:760px){.header-controls{gap:9px;flex:1;justify-content:flex-end}.header-controls .search{margin:0;min-width:0}.header-controls .search input{width:100%;min-width:0}.header-controls .search kbd{display:none}.header-controls .search{max-width:220px;flex:1}.language-switch button{padding:8px 7px}.lesson-meta{flex-wrap:wrap;gap:8px 20px}.section-heading{flex-wrap:wrap;gap:5px}.hero h1{overflow-wrap:break-word}html[lang=en] .hero h1{font-size:34px}.tabs{gap:18px}.tab{font-size:12px}}
 @media print{.header-controls{display:none}}
+
+/* Keep off-screen navigation out of the keyboard order; allow short screens to scroll. */
+#sidebar{overflow-y:auto}
+#menu-close{display:none}
+@media(max-width:760px){
+ #sidebar{max-width:calc(100vw - 35px);transition:transform .2s,visibility .2s}
+ body:not(.menu-open) #sidebar{visibility:hidden}
+ #menu-close{display:block;align-self:flex-end;background:var(--soft);color:var(--green);border-radius:5px;font-size:12px;padding:8px 12px;margin:-18px -5px 18px 0}
+ #sidebar .sidebar-bottom{flex-shrink:0}
+ .brand{padding-bottom:25px}
+}
+
+/* Language and search controls remain available while reading. */
+header{position:sticky;top:0;z-index:4;background:var(--paper)}
+.toc{top:110px}
+.reading-section{scroll-margin-top:110px}
+@media(max-width:760px){.reading-section{scroll-margin-top:96px}}
+.search:focus-within{outline:3px solid #75974b;outline-offset:3px}
