@@ -20,7 +20,7 @@ python3 -m http.server 8151
 
 ## แก้ไขเนื้อหา
 
-แก้ `build_content.py` แล้วรัน `python3 build_content.py` เพื่อสร้าง `lessons.json` ใหม่ ข้อความใน `sources/` ดึงจากไฟล์ DOCX ใน Downloads โดยอ่าน XML ของย่อหน้าและเก็บข้อความเดิมไว้ ไม่มีไฟล์ซ้ำ Class 2 (1)
+แก้ `build_content.py` แล้วรัน `python3 build_content.py` เพื่อสร้าง `lessons.json` ใหม่ รัน `python3 extract_transcripts.py` เพื่อดึง transcript โดยรักษาการขึ้นบรรทัดและเวลาเดิม ข้อความใน `sources/` ดึงจากไฟล์ DOCX ใน Downloads โดยอ่าน XML ของย่อหน้าและเก็บข้อความเดิมไว้ ไม่มีไฟล์ซ้ำ Class 2 (1)
 
 บทเรียนเป็นการเรียบเรียงใหม่และมีตัวอย่างที่เขียนเพิ่ม ไม่ใช่เอกสารทางการของผู้สอน ส่วน transcript เป็นข้อความถอดเสียงอัตโนมัติซึ่งอาจคลาดเคลื่อน
 
