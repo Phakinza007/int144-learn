@@ -48,11 +48,23 @@ function overview() {
 function completionButton(l) {
  return `<button class="primary" id="complete" aria-pressed="${completed.includes(l.id)}">${t(completed.includes(l.id) ? 'completed' : 'markComplete')}</button>`;
 }
+function lessonDiagram(id) {
+ const diagrams = {
+  1: ['diagram1Title', 'diagram1Steps'],
+  2: ['diagram2Title', 'diagram2Steps'],
+  3: ['diagram3Title', 'diagram3Steps'],
+  4: ['diagram4Title', 'diagram4Steps'],
+  5: ['diagram5Title', 'diagram5Steps']
+ };
+ const [titleKey, stepsKey] = diagrams[id] || [];
+ const steps = titleKey ? t(stepsKey).split('|') : [];
+ return `<figure class="lesson-diagram" role="img" aria-label="${esc(t(titleKey))}"><figcaption>${esc(t(titleKey))}</figcaption><div class="diagram-flow">${steps.map((step,i) => `${i ? '<span class="diagram-arrow" aria-hidden="true">→</span>' : ''}<span class="diagram-node">${esc(step)}</span>`).join('')}</div></figure>`;
+}
 async function lesson(l, source, version, {focusTab = false} = {}) {
  document.title = t('lessonTitle', {id:l.id, title:l.title});
  navigation(l.id);
  $('#crumb').textContent = t('lessonNumber', {id:l.id});
- $('#main').innerHTML = `<div class="lesson-header"><div class="eyebrow">LESSON ${String(l.id).padStart(2,'0')} / 05</div><h1>${esc(l.title)}</h1><p class="intro">${esc(l.intro)}</p><div class="lesson-meta"><span>${esc(l.en)}</span><span>${t('readDuration', {count:l.minutes})}</span></div></div><div class="tabs" role="tablist" aria-label="${t('contentFormat')}"><button id="tab-reading" class="tab" role="tab" aria-selected="${!source}" aria-controls="panel">${t('readingTab')}</button><button id="tab-source" class="tab" role="tab" aria-selected="${source}" aria-controls="panel">${t('transcriptTab')}</button></div><div id="panel" role="tabpanel" tabindex="0" aria-labelledby="tab-${source ? 'source' : 'reading'}"></div>`;
+ $('#main').innerHTML = `<div class="lesson-header"><div class="eyebrow">LESSON ${String(l.id).padStart(2,'0')} / 05</div><h1>${esc(l.title)}</h1><p class="intro">${esc(l.intro)}</p>${lessonDiagram(l.id)}<div class="lesson-meta"><span>${esc(l.en)}</span><span>${t('readDuration', {count:l.minutes})}</span></div></div><div class="tabs" role="tablist" aria-label="${t('contentFormat')}"><button id="tab-reading" class="tab" role="tab" aria-selected="${!source}" aria-controls="panel">${t('readingTab')}</button><button id="tab-source" class="tab" role="tab" aria-selected="${source}" aria-controls="panel">${t('transcriptTab')}</button></div><div id="panel" role="tabpanel" tabindex="0" aria-labelledby="tab-${source ? 'source' : 'reading'}"></div>`;
  $('#tab-reading').onclick = () => { location.hash = `lesson/${l.id}`; };
  $('#tab-source').onclick = () => { location.hash = `lesson/${l.id}/transcript`; };
  document.querySelectorAll('[role=tab]').forEach(tab => {

@@ -33,3 +33,11 @@ header{position:sticky;top:0;z-index:4;background:var(--paper)}
 
 .reading-section .section-source{font-size:11px;line-height:1.8;color:var(--muted);margin:18px 0 0}
 .reference-heading{font-weight:600;margin:16px 0 6px}.reference-list{margin:0;padding-left:20px}.reference-list a{overflow-wrap:anywhere}
+.lesson-diagram{margin:24px 0 18px;padding:18px 20px;background:#fff;border:1px solid var(--line);border-radius:10px}
+.lesson-diagram figcaption{font-size:12px;font-weight:600;color:var(--green);margin-bottom:13px}
+.diagram-flow{display:flex;align-items:stretch;justify-content:center;gap:9px}
+.diagram-node{display:flex;align-items:center;justify-content:center;min-height:56px;flex:1;padding:10px 12px;text-align:center;line-height:1.55;font-size:12px;background:var(--soft);border:1px solid #dce7d3;border-radius:7px}
+.diagram-node:nth-of-type(4n+1){background:#eef2e8}
+.diagram-arrow{display:flex;align-items:center;color:#7f9472;font-size:18px}
+@media(max-width:760px){.lesson-diagram{margin:20px 0 16px;padding:15px}.diagram-flow{display:grid;grid-template-columns:1fr;gap:6px}.diagram-node{min-height:0;padding:9px 12px}.diagram-arrow{height:15px;justify-content:center;transform:rotate(90deg);font-size:15px}}
+@media print{.lesson-diagram{break-inside:avoid}}
